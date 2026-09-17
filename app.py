@@ -35,7 +35,7 @@ supabase = create_client(
 
 app = Flask(__name__)
 
-app.secret_key = "students-portal-secret-key"
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 
 # ==========================================
