@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="register-container">
+
+        <div class="register-card">
+
+            <h1>Teacher Dashboard</h1>
+
+            <p class="subtitle">
+                Welcome, {{ teacher.full_name }}!
+            </p>
+
+            <hr>
+
+            <div class="form-group">
+
+                <label>Teacher Name</label>
+
+                <p>{{ teacher.full_name }}</p>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <p>{{ teacher.email }}</p>
+
+            </div>
+
+            <hr>
+
+            <h2 style="margin-bottom: 20px;">
+                Grade Management
+            </h2>
+
+            <a href="{{ url_for('gradebook') }}"
+               class="register-btn"
+               style="display:block;
+                      text-align:center;
+                      text-decoration:none;
+                      margin-bottom:15px;">
+
+                Open Grade Sheet
+
+            </a>
+
+            <a href="{{ url_for('logout') }}"
+               class="register-btn"
+               style="display:block;
+                      text-align:center;
+                      text-decoration:none;">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

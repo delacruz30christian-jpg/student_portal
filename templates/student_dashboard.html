@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+</head>
+
+<body>
+
+<div class="student-dashboard-container">
+
+    <!-- =========================
+         DASHBOARD HEADER
+    ========================== -->
+
+    <div class="dashboard-header">
+
+        <div>
+            <h1>Welcome, {{ student.full_name }}!</h1>
+
+            <p>
+                Student Dashboard
+            </p>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- =========================
+         FLASH MESSAGES
+    ========================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- =========================
+         STUDENT INFORMATION
+    ========================== -->
+
+    <div class="student-info-card">
+
+        <h2>Student Information</h2>
+
+        <br>
+
+        <div class="student-info-grid">
+
+            <div class="info-item">
+
+                <strong>Student Number</strong>
+
+                <span>
+                    {{ student.student_number or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Full Name</strong>
+
+                <span>
+                    {{ student.full_name or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Email</strong>
+
+                <span>
+                    {{ student.email or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Age</strong>
+
+                <span>
+                    {{ student.age or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Birthdate</strong>
+
+                <span>
+                    {{ student.birthdate or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Gender</strong>
+
+                <span>
+                    {{ student.gender or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Course</strong>
+
+                <span>
+                    {{ student.course or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Year Level</strong>
+
+                <span>
+                    {{ student.year_level or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <strong>Section</strong>
+
+                <span>
+                    {{ student.section or '-' }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item full-width">
+
+                <strong>Address</strong>
+
+                <span>
+                    {{ student.address or '-' }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         GRADES
+    ========================== -->
+
+    <div class="grades-card">
+
+        <div class="grades-header">
+
+            <h2>My Grades</h2>
+
+            <p>
+                Your encoded grades and computed averages
+            </p>
+
+        </div>
+
+
+        {% if grades %}
+
+        <div class="table-wrapper">
+
+            <table class="student-grade-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Subject</th>
+
+                        <th>Subject Name</th>
+
+                        <th>Prelim</th>
+
+                        <th>Midterm</th>
+
+                        <th>Finals</th>
+
+                        <th>Average</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for grade in grades %}
+
+                    <tr>
+
+                        <td>
+                            {{ grade.subject_code }}
+                        </td>
+
+
+                        <td class="subject-name">
+                            {{ grade.subject_name }}
+                        </td>
+
+
+                        <td>
+
+                            {% if grade.prelim is not none %}
+                                {{ "%.2f"|format(grade.prelim|float) }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if grade.midterm is not none %}
+                                {{ "%.2f"|format(grade.midterm|float) }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if grade.finals is not none %}
+                                {{ "%.2f"|format(grade.finals|float) }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+
+                        <td class="student-average">
+
+                            {% if grade.average is not none %}
+                                {{ "%.2f"|format(grade.average|float) }}
+                            {% else %}
+                                -
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-grades">
+
+            <h3>No grades available yet.</h3>
+
+            <p>
+                Your grades will appear here once your teacher encodes them.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Grade Sheet</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="gradebook-container">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <div class="gradebook-header">
+
+        <div>
+
+            <h1>Teacher Grade Sheet</h1>
+
+            <p>
+                Encode grades for your students
+            </p>
+
+        </div>
+
+        <a href="{{ url_for('teacher_dashboard') }}"
+           class="back-btn">
+
+            ← Dashboard
+
+        </a>
+
+    </div>
+
+
+    <!-- ==========================================
+         FLASH MESSAGES
+    =========================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- ==========================================
+         SUBJECT AND SECTION FILTER
+    =========================================== -->
+
+    <form method="GET"
+          action="{{ url_for('gradebook') }}"
+          class="grade-filter">
+
+        <!-- SUBJECT -->
+
+        <div class="filter-group">
+
+            <label for="subject_id">
+                Subject
+            </label>
+
+            <select name="subject_id"
+                    id="subject_id"
+                    required>
+
+                <option value="">
+                    Select Subject
+                </option>
+
+                {% for subject in subjects %}
+
+                    <option value="{{ subject.id }}"
+                        {% if selected_subject|string == subject.id|string %}
+                            selected
+                        {% endif %}>
+
+                        {{ subject.subject_code }}
+                        -
+                        {{ subject.subject_name }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- SECTION -->
+
+        <div class="filter-group">
+
+            <label for="section">
+                Section
+            </label>
+
+            <select name="section"
+                    id="section"
+                    required>
+
+                <option value="">
+                    Select Section
+                </option>
+
+                {% for section in sections %}
+
+                    <option value="{{ section }}"
+                        {% if selected_section == section %}
+                            selected
+                        {% endif %}>
+
+                        {{ section }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <button type="submit"
+                class="load-btn">
+
+            Load Students
+
+        </button>
+
+    </form>
+
+
+    <!-- ==========================================
+         GRADE SHEET
+    =========================================== -->
+
+    {% if selected_subject and selected_section %}
+
+        <form method="POST"
+              action="{{ url_for('gradebook') }}">
+
+            <!-- Hidden values -->
+
+            <input type="hidden"
+                   name="subject_id"
+                   value="{{ selected_subject }}">
+
+            <input type="hidden"
+                   name="section"
+                   value="{{ selected_section }}">
+
+            <input type="hidden"
+                   name="action"
+                   value="save">
+
+
+            <div class="table-wrapper">
+
+                <table class="grade-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>No.</th>
+
+                            <th>Student Number</th>
+
+                            <th>Student Name</th>
+
+                            <th>Course</th>
+
+                            <th>Prelim</th>
+
+                            <th>Midterm</th>
+
+                            <th>Finals</th>
+
+                            <th>Average</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for student in students %}
+
+                        {% set grade = grades.get(student.id) %}
+
+                        <tr>
+
+                            <!-- NUMBER -->
+
+                            <td>
+
+                                {{ loop.index }}
+
+                            </td>
+
+
+                            <!-- STUDENT NUMBER -->
+
+                            <td>
+
+                                {{ student.student_number or '-' }}
+
+                            </td>
+
+
+                            <!-- NAME -->
+
+                            <td class="student-name">
+
+                                {{ student.full_name }}
+
+                            </td>
+
+
+                            <!-- COURSE -->
+
+                            <td>
+
+                                {{ student.course or '-' }}
+
+                            </td>
+
+
+                            <!-- ==================================
+                                 PRELIM
+                            =================================== -->
+
+                            <td>
+
+                                <select
+                                    name="prelim_{{ student.id }}"
+                                    class="grade-input">
+
+                                    <option value="">
+                                        -
+                                    </option>
+
+                                    {% for rating in [
+                                        '1.00',
+                                        '1.25',
+                                        '1.50',
+                                        '1.75',
+                                        '2.00',
+                                        '2.25',
+                                        '2.50',
+                                        '2.75',
+                                        '3.00',
+                                        '5.00'
+                                    ] %}
+
+                                        <option
+                                            value="{{ rating }}"
+
+                                            {% if grade
+                                                  and grade.prelim is not none
+                                                  and "%.2f"|format(grade.prelim|float) == rating %}
+
+                                            selected
+
+                                            {% endif %}
+                                        >
+
+                                            {{ rating }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </td>
+
+
+                            <!-- ==================================
+                                 MIDTERM
+                            =================================== -->
+
+                            <td>
+
+                                <select
+                                    name="midterm_{{ student.id }}"
+                                    class="grade-input">
+
+                                    <option value="">
+                                        -
+                                    </option>
+
+                                    {% for rating in [
+                                        '1.00',
+                                        '1.25',
+                                        '1.50',
+                                        '1.75',
+                                        '2.00',
+                                        '2.25',
+                                        '2.50',
+                                        '2.75',
+                                        '3.00',
+                                        '5.00'
+                                    ] %}
+
+                                        <option
+                                            value="{{ rating }}"
+
+                                            {% if grade
+                                                  and grade.midterm is not none
+                                                  and "%.2f"|format(grade.midterm|float) == rating %}
+
+                                            selected
+
+                                            {% endif %}
+                                        >
+
+                                            {{ rating }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </td>
+
+
+                            <!-- ==================================
+                                 FINALS
+                            =================================== -->
+
+                            <td>
+
+                                <select
+                                    name="finals_{{ student.id }}"
+                                    class="grade-input">
+
+                                    <option value="">
+                                        -
+                                    </option>
+
+                                    {% for rating in [
+                                        '1.00',
+                                        '1.25',
+                                        '1.50',
+                                        '1.75',
+                                        '2.00',
+                                        '2.25',
+                                        '2.50',
+                                        '2.75',
+                                        '3.00',
+                                        '5.00'
+                                    ] %}
+
+                                        <option
+                                            value="{{ rating }}"
+
+                                            {% if grade
+                                                  and grade.finals is not none
+                                                  and "%.2f"|format(grade.finals|float) == rating %}
+
+                                            selected
+
+                                            {% endif %}
+                                        >
+
+                                            {{ rating }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </td>
+
+
+                            <!-- ==================================
+                                 AVERAGE
+                            =================================== -->
+
+                            <td class="average-cell">
+
+                                {% if grade
+                                      and grade.average is not none %}
+
+                                    {{ "%.2f"|format(grade.average|float) }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="8"
+                                class="no-students">
+
+                                No students found
+                                in this section.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ==========================================
+                 SAVE BUTTON
+            =========================================== -->
+
+            {% if students %}
+
+                <div class="save-container">
+
+                    <button type="submit"
+                            class="save-grades-btn">
+
+                        Save All Grades
+
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+        </form>
+
+
+    {% else %}
+
+        <!-- ==========================================
+             EMPTY STATE
+        =========================================== -->
+
+        <div class="empty-gradebook">
+
+            <h2>Grade Sheet</h2>
+
+            <p>
+
+                Select a subject and section
+                to load the students.
+
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

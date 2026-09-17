@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form - Students Portal</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="register-container">
+
+        <div class="register-card">
+
+            <h1>Registration Form</h1>
+            <p class="subtitle">Create your Students Portal account</p>
+
+            <form method="POST" action="{{ url_for('register') }}">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="message {{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <!-- Student Number -->
+                <div class="form-group">
+                    <label for="student_number">Student Number</label>
+
+                    <input
+                        type="text"
+                        id="student_number"
+                        name="student_number"
+                        placeholder="e.g. 2026-001"
+                        required
+                        >
+                </div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        placeholder="Enter your full name"
+                        required
+                    >
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        required
+                    >
+                </div>
+
+                <!-- Age -->
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input
+                        type="number"
+                        id="age"
+                        name="age"
+                        min="1"
+                        max="100"
+                        placeholder="Enter your age"
+                        required
+                    >
+                </div>
+
+                <!-- Birthdate -->
+                <div class="form-group">
+                    <label for="birthdate">Birthdate</label>
+                    <input
+                        type="date"
+                        id="birthdate"
+                        name="birthdate"
+                        required
+                    >
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <label>Gender</label>
+
+                    <div class="radio-group">
+                        <label>
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Male"
+                                required
+                            >
+                            Male
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="gender"
+                                value="Female"
+                            >
+                            Female
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="form-group">
+                    <label>Skills</label>
+
+                    <div class="checkbox-group">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="skills"
+                                value="HTML"
+                            >
+                            HTML
+                        </label>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="skills"
+                                value="CSS"
+                            >
+                            CSS
+                        </label>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="skills"
+                                value="Python"
+                            >
+                            Python
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- Course -->
+                <div class="form-group">
+                    <label for="course">Course</label>
+
+                    <select id="course" name="course" required>
+                        <option value="">-- Select Course --</option>
+                        <option value="BSIT">BSIT</option>
+                        <option value="BIndTech">BIndTech</option>
+                    </select>
+                </div>
+                <!-- Year Level -->
+                <div class="form-group">
+                    <label for="year_level">Year Level</label>
+
+                        <select id="year_level" name="year_level" required>
+                            <option value="">-- Select Year Level --</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                </div>
+
+                <!-- Section -->
+                <div class="form-group">
+                    <label for="section">Section</label>
+
+                    <input
+                        type="text"
+                        id="section"
+                        name="section"
+                        placeholder="e.g. 1-A"
+                        required
+                        >
+                </div>
+
+
+                <!-- Address -->
+                <div class="form-group">
+                    <label for="address">Address</label>
+
+                    <textarea
+                        id="address"
+                        name="address"
+                        rows="4"
+                        placeholder="Enter your complete address"
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="register-btn">
+                    Create Account
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
