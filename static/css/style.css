@@ -411,3 +411,38 @@ textarea {
     }
 
 }
+
+/* ==========================================
+   PASSWORD SHOW / HIDE
+========================================== */
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 50px;
+}
+
+.show-password-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 18px;
+    padding: 5px;
+
+    color: #555;
+}
+
+.show-password-btn:hover {
+    color: #2563eb;
+}

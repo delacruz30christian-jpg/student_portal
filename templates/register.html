@@ -76,7 +76,19 @@
                     >
                 </div>
 
-               
+                <!-- Age -->
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input
+                        type="number"
+                        id="age"
+                        name="age"
+                        min="1"
+                        max="100"
+                        placeholder="Enter your age"
+                        required
+                    >
+                </div>
 
                 <!-- Birthdate -->
                 <div class="form-group">
@@ -115,7 +127,42 @@
                     </div>
                 </div>
 
-                
+                <!-- Skills -->
+                <div class="form-group">
+                    <label>Skills</label>
+
+                    <div class="checkbox-group">
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="skills"
+                                value="HTML"
+                            >
+                            HTML
+                        </label>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="skills"
+                                value="CSS"
+                            >
+                            CSS
+                        </label>
+
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="skills"
+                                value="Python"
+                            >
+                            Python
+                        </label>
+
+                    </div>
+                </div>
+
                 <!-- Course -->
                 <div class="form-group">
                     <label for="course">Course</label>
@@ -141,13 +188,15 @@
 
                 <!-- Section -->
                 <div class="form-group">
-                    <label for="section">Set</label>
+                    <label for="section">Section</label>
 
-                    <select id="year_level" name="year_level" required>
-                            <option value="">-- Select Year Level --</option>
-                            <option value="1st Year">A</option>
-                            <option value="2nd Year">B</option>
-                    </select>
+                    <input
+                        type="text"
+                        id="section"
+                        name="section"
+                        placeholder="e.g. A"
+                        required
+                        >
                 </div>
 
 
