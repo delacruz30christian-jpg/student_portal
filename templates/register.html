@@ -64,17 +64,32 @@
                     >
                 </div>
 
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Create a password"
-                        required
-                    >
-                </div>
+                
+ <!-- Password -->
+<div class="form-group">
+
+    <label for="password">Password</label>
+
+    <div class="password-wrapper">
+
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            required
+        >
+
+        <button
+            type="button"
+            class="password-toggle"
+            onclick="togglePassword('password', this)"
+            aria-label="Show password"
+        >👁️</button>
+
+    </div>
+
+</div>
 
               
 
@@ -177,6 +192,6 @@
         </div>
 
     </div>
-
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

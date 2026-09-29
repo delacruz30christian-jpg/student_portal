@@ -446,3 +446,34 @@ textarea {
 .show-password-btn:hover {
     color: #2563eb;
 }
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 50px;
+    box-sizing: border-box;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+
+    line-height: 1;
+}
+
+.password-toggle:hover {
+    opacity: 0.7;
+}
