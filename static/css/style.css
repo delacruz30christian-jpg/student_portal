@@ -477,3 +477,69 @@ textarea {
 .password-toggle:hover {
     opacity: 0.7;
 }
+
+/* ==========================================
+   GRADEBOOK SEARCH AND SORT
+========================================== */
+
+.gradebook-tools {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.search-group,
+.sort-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-group {
+    flex: 1;
+    min-width: 280px;
+}
+
+.search-group label,
+.sort-group label {
+    font-weight: bold;
+}
+
+.search-group input,
+.sort-group select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.search-group input {
+    width: 100%;
+}
+
+.sort-group select {
+    min-width: 120px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+    .gradebook-tools {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-group {
+        min-width: 100%;
+    }
+
+    .sort-group select {
+        width: 100%;
+    }
+
+}
