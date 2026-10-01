@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Login | Student Portal</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #1e3a8a
+                );
+        }
+
+
+        /* ==========================================
+           LOGIN CONTAINER
+        ========================================== */
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+
+        /* ==========================================
+           LOGIN CARD
+        ========================================== */
+
+        .login-card {
+            background: #ffffff;
+
+            padding: 40px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 20px 50px
+                rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* ==========================================
+           HEADER
+        ========================================== */
+
+        .login-header {
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+        .admin-icon {
+            width: 70px;
+            height: 70px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #1e3a8a;
+
+            color: white;
+
+            font-size: 32px;
+        }
+
+        .login-header h1 {
+            margin: 0 0 8px;
+
+            color: #111827;
+
+            font-size: 28px;
+        }
+
+        .login-header p {
+            margin: 0;
+
+            color: #6b7280;
+
+            font-size: 14px;
+        }
+
+
+        /* ==========================================
+           FLASH MESSAGES
+        ========================================== */
+
+        .flash-message {
+            padding: 12px 14px;
+
+            margin-bottom: 18px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+
+        /* ==========================================
+           FORM
+        ========================================== */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #374151;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37, 99, 235, 0.12);
+        }
+
+
+        /* ==========================================
+           PASSWORD
+        ========================================== */
+
+        .password-input {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+
+            right: 10px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            cursor: pointer;
+
+            font-size: 18px;
+
+            padding: 5px;
+        }
+
+
+        /* ==========================================
+           LOGIN BUTTON
+        ========================================== */
+
+        .login-button {
+            width: 100%;
+
+            border: none;
+
+            padding: 13px;
+
+            border-radius: 8px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s,
+                transform 0.1s;
+        }
+
+        .login-button:hover {
+            background: #1d4ed8;
+        }
+
+        .login-button:active {
+            transform: scale(0.99);
+        }
+
+
+        /* ==========================================
+           BACK LINK
+        ========================================== */
+
+        .back-link {
+            display: block;
+
+            margin-top: 22px;
+
+            text-align: center;
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
+
+        .footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #9ca3af;
+
+            font-size: 12px;
+        }
+
+
+        /* ==========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 480px) {
+
+            .login-container {
+                padding: 15px;
+            }
+
+            .login-card {
+                padding: 30px 22px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-container">
+
+
+    <div class="login-card">
+
+
+        <!-- HEADER -->
+
+        <div class="login-header">
+
+            <div class="admin-icon">
+                🔐
+            </div>
+
+            <h1>
+                Admin Login
+            </h1>
+
+            <p>
+                Administrator access
+            </p>
+
+        </div>
+
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- LOGIN FORM -->
+
+        <form
+            method="POST"
+            action="{{ url_for('admin_login') }}"
+        >
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-input"
+                    placeholder="Enter admin email"
+                    required
+                    autocomplete="email"
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input password-input"
+                        placeholder="Enter admin password"
+                        required
+                        autocomplete="current-password"
+                    >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        onclick="togglePassword()"
+                        aria-label="Show password"
+                    >
+                        👁️
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                Login as Admin
+            </button>
+
+
+        </form>
+
+
+        <!-- BACK -->
+
+        <a
+            href="{{ url_for('login') }}"
+            class="back-link"
+        >
+            ← Back to Student / Instructor Login
+        </a>
+
+
+        <div class="footer">
+            Student Portal Administration
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+function togglePassword() {
+
+    const password =
+        document.getElementById("password");
+
+    const button =
+        document.querySelector(
+            ".toggle-password"
+        );
+
+
+    if (password.type === "password") {
+
+        password.type = "text";
+
+        button.textContent = "🙈";
+
+        button.setAttribute(
+            "aria-label",
+            "Hide password"
+        );
+
+    } else {
+
+        password.type = "password";
+
+        button.textContent = "👁️";
+
+        button.setAttribute(
+            "aria-label",
+            "Show password"
+        );
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>

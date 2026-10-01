@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Instructor</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0b2e16 0%,
+                    #145c2a 30%,
+                    #1f7a3d 55%,
+                    #176332 75%,
+                    #082612 100%
+                );
+
+            min-height: 100vh;
+        }
+
+        .page-container {
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 30px;
+        }
+
+        .edit-card {
+            width: 100%;
+            max-width: 600px;
+
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .edit-card h1 {
+            margin: 0 0 8px;
+
+            color: #145c2a;
+
+            font-size: 28px;
+        }
+
+        .edit-card p {
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-weight: bold;
+
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #198754;
+
+            box-shadow:
+                0 0 0 3px rgba(
+                    25,
+                    135,
+                    84,
+                    0.15
+                );
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .save-btn {
+            flex: 1;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #198754;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #157347;
+        }
+
+        .cancel-btn {
+            flex: 1;
+
+            padding: 13px;
+
+            border-radius: 8px;
+
+            background: #6c757d;
+
+            color: white;
+
+            text-decoration: none;
+
+            text-align: center;
+
+            font-weight: bold;
+        }
+
+        .cancel-btn:hover {
+            background: #5c636a;
+        }
+
+        .flash {
+            padding: 12px 15px;
+
+            margin-bottom: 20px;
+
+            border-radius: 8px;
+        }
+
+        .flash.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .flash.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 600px) {
+
+            .page-container {
+                padding: 20px;
+            }
+
+            .edit-card {
+                padding: 25px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <div class="edit-card">
+
+        <h1>
+            Edit Instructor
+        </h1>
+
+        <p>
+            Update the instructor's information below.
+        </p>
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+        <form method="POST">
+
+            <div class="form-group">
+
+                <label>
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    name="full_name"
+                    value="{{ instructor.get('full_name', '') }}"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ instructor.get('email', '') }}"
+                    required
+                >
+
+            </div>
+
+            <div class="button-group">
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Save Changes
+                </button>
+
+                <a
+                    href="{{ url_for('admin_instructors') }}"
+                    class="cancel-btn"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

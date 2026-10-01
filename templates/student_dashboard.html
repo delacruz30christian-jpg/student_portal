@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5">
 </head>
 
 <body>
@@ -84,16 +84,23 @@
         </div>
     </div>
 
-    <a href="{{ url_for('student_subjects') }}" class="btn">
-        Add Enrolled Subject
-    </a>
 
-    <div class="grades-card">
+   
+<button type="button"
+        onclick="window.location.href='{{ url_for('student_subjects') }}'"
+        class="register-btn">
+        Add Enrolled Subject
+</button>
+        
+
+
+    <br>
+    <br>
 
         <div class="grades-header">
-            <h2>My Enrolled Subjects</h2>
-            <p>Subjects you are currently enrolled in</p>
+            Enrolled Subjects
         </div>
+   
 
         {% if enrolled_subjects %}
 
@@ -192,7 +199,7 @@
 
     </div>
 
-</div>
+
 
 </body>
 </html>

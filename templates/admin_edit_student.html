@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Student</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .save {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .cancel {
+            background: #e5e7eb;
+            color: #111827;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Edit Student</h1>
+</div>
+
+<div class="container">
+
+    <div class="card">
+
+        <form method="POST">
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>Student Number</label>
+                    <input
+                        type="text"
+                        name="student_number"
+                        value="{{ student.get('student_number', '') or '' }}"
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Full Name</label>
+                    <input
+                        type="text"
+                        name="full_name"
+                        value="{{ student.get('full_name', '') or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value="{{ student.get('email', '') or '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Birthdate</label>
+                    <input
+                        type="date"
+                        name="birthdate"
+                        value="{{ student.get('birthdate', '') or '' }}"
+                    >
+                </div>
+
+                <div class="field">
+                    <label>Gender</label>
+
+                    <select name="gender">
+
+                        <option value="">Select Gender</option>
+
+                        <option value="Male"
+                            {% if student.get('gender') == 'Male' %}selected{% endif %}>
+                            Male
+                        </option>
+
+                        <option value="Female"
+                            {% if student.get('gender') == 'Female' %}selected{% endif %}>
+                            Female
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Course</label>
+
+                    <select name="course">
+
+                        <option value="">Select Course</option>
+
+                        <option value="BSIT"
+                            {% if student.get('course') == 'BSIT' %}selected{% endif %}>
+                            BSIT
+                        </option>
+
+                        <option value="BIndTech"
+                            {% if student.get('course') == 'BIndTech' %}selected{% endif %}>
+                            BIndTech
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Year Level</label>
+
+                    <select name="year_level">
+
+                        <option value="">Select Year Level</option>
+
+                        {% for year in ['1st Year', '2nd Year', '3rd Year', '4th Year'] %}
+
+                        <option value="{{ year }}"
+                            {% if student.get('year_level') == year %}selected{% endif %}>
+                            {{ year }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Section</label>
+
+                    <select name="section">
+
+                        <option value="">Select Section</option>
+
+                        <option value="A"
+                            {% if student.get('section') == 'A' %}selected{% endif %}>
+                            A
+                        </option>
+
+                        <option value="B"
+                            {% if student.get('section') == 'B' %}selected{% endif %}>
+                            B
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="field full">
+                    <label>Address</label>
+
+                    <textarea name="address">{{ student.get('address', '') or '' }}</textarea>
+                </div>
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="save"
+                >
+                    Save Changes
+                </button>
+
+                <a
+                    href="{{ url_for('admin_students') }}"
+                    class="cancel"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

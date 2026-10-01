@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Enrollments Management</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0b2e16 0%,
+                    #145c2a 30%,
+                    #1f7a3d 55%,
+                    #176332 75%,
+                    #082612 100%
+                );
+
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(6, 27, 13, 0.92);
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffd966;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #f4c542;
+            color: #123d22;
+            padding: 11px 18px;
+            border-radius: 7px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #ffd966;
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            padding: 11px 14px;
+            width: 320px;
+            border: none;
+            border-radius: 7px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.20);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #145c2a;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f0fdf4;
+        }
+
+        .student-number {
+            font-weight: bold;
+            color: #145c2a;
+        }
+
+        .subject-code {
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: #e8f5ec;
+            color: #145c2a;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .delete-btn {
+            border: none;
+            background: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0;
+        }
+
+        .delete-btn:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .flash {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .flash.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .flash.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+
+            .container {
+                padding: 20px;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    <h1>
+        Enrollments Management
+    </h1>
+
+</div>
+
+
+<div class="container">
+
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <div class="top-bar">
+
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="back-btn"
+        >
+            ← Dashboard
+        </a>
+
+
+        <input
+            type="text"
+            id="searchInput"
+            class="search-box"
+            placeholder="Search enrollment..."
+            onkeyup="searchEnrollments()"
+        >
+
+    </div>
+
+
+    <div class="table-container">
+
+
+        <table id="enrollmentTable">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Student Number
+                    </th>
+
+                    <th>
+                        Student Name
+                    </th>
+
+                    <th>
+                        Subject Code
+                    </th>
+
+                    <th>
+                        Subject Name
+                    </th>
+
+                    <th>
+                        Instructor
+                    </th>
+
+                    <th>
+                        Section
+                    </th>
+
+                    <th>
+                        Created
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for enrollment in enrollments %}
+
+
+                <tr>
+
+                    <td class="student-number">
+
+                        {{ enrollment.student_number }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ enrollment.student_name }}
+
+                    </td>
+
+
+                    <td class="subject-code">
+
+                        {{ enrollment.subject_code }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ enrollment.subject_name }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ enrollment.teacher_name }}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="section-badge">
+
+                            {{ enrollment.display_section }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {{ enrollment.created_at or "-" }}
+
+                    </td>
+
+
+                    <td>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'admin_delete_enrollment',
+                                enrollment_id=enrollment.id
+                            ) }}"
+                            style="display:inline;"
+                            onsubmit="
+                                return confirm(
+                                    'Remove this enrollment?\\n\\nThe student will be unenrolled from this subject.\\n\\nThis will NOT delete the student, subject, or grades.'
+                                );
+                            "
+                        >
+
+                            <button
+                                type="submit"
+                                class="delete-btn"
+                            >
+                                Remove
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+
+                {% else %}
+
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="empty"
+                    >
+                        No enrollments found.
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+function searchEnrollments() {
+
+    const input =
+        document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+
+    const rows =
+        document.querySelectorAll(
+            "#enrollmentTable tbody tr"
+        );
+
+
+    rows.forEach(row => {
+
+        const text =
+            row.textContent.toLowerCase();
+
+        row.style.display =
+            text.includes(input)
+            ? ""
+            : "none";
+
+    });
+
+}
+
+</script>
+
+
+</body>
+
+</html>

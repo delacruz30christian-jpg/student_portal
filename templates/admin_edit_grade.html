@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Grade</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 20% 15%,
+                    rgba(255, 255, 255, 0.18),
+                    transparent 40%
+                ),
+                radial-gradient(
+                    circle at 80% 10%,
+                    rgba(117, 255, 164, 0.18),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #0a2f17,
+                    #145f2d,
+                    #218342,
+                    #176a32,
+                    #082812
+                );
+
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.97);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #145f2d;
+        }
+
+        .info {
+            background: #f1f8f3;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .info p {
+            margin: 7px 0;
+        }
+
+        .info strong {
+            color: #145f2d;
+        }
+
+        .grade-row {
+            margin-bottom: 18px;
+        }
+
+        .grade-row label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #145f2d;
+        }
+
+        .grade-row select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        .grade-row select:focus {
+            outline: none;
+            border-color: #198754;
+            box-shadow: 0 0 0 3px rgba(25,135,84,0.12);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+        }
+
+        .save-btn {
+            background: #198754;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #157347;
+        }
+
+        .cancel-btn {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .cancel-btn:hover {
+            background: #d1d5db;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="container">
+
+        <div class="card">
+
+            <h1>Edit Grade</h1>
+
+            <div class="info">
+
+                <p>
+                    <strong>Student Number:</strong>
+                    {{ student.student_number or "-" }}
+                </p>
+
+                <p>
+                    <strong>Student:</strong>
+                    {{ student.full_name or "-" }}
+                </p>
+
+                <p>
+                    <strong>Subject:</strong>
+                    {{ subject.subject_code or "-" }}
+                    - 
+                    {{ subject.subject_name or "-" }}
+                </p>
+
+                <p>
+                    <strong>Instructor:</strong>
+                    {{ teacher.full_name if teacher else "-" }}
+                </p>
+
+                <p>
+                    <strong>Section:</strong>
+                    {{ subject.section or "-" }}
+                </p>
+
+            </div>
+
+
+            <form method="POST">
+
+                <div class="grade-row">
+
+                    <label for="prelim">
+                        Prelim
+                    </label>
+
+                    <select name="prelim" id="prelim">
+
+                        <option value="">-- No Grade --</option>
+
+                        {% for rating in allowed_ratings %}
+
+                        <option
+                            value="{{ "%.2f"|format(rating) }}"
+                            {% if grade.prelim is not none
+                               and grade.prelim|float == rating %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ "%.2f"|format(rating) }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="grade-row">
+
+                    <label for="midterm">
+                        Midterm
+                    </label>
+
+                    <select name="midterm" id="midterm">
+
+                        <option value="">-- No Grade --</option>
+
+                        {% for rating in allowed_ratings %}
+
+                        <option
+                            value="{{ "%.2f"|format(rating) }}"
+                            {% if grade.midterm is not none
+                               and grade.midterm|float == rating %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ "%.2f"|format(rating) }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="grade-row">
+
+                    <label for="finals">
+                        Finals
+                    </label>
+
+                    <select name="finals" id="finals">
+
+                        <option value="">-- No Grade --</option>
+
+                        {% for rating in allowed_ratings %}
+
+                        <option
+                            value="{{ "%.2f"|format(rating) }}"
+                            {% if grade.finals is not none
+                               and grade.finals|float == rating %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ "%.2f"|format(rating) }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="buttons">
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        Save Changes
+                    </button>
+
+                    <a
+                        href="{{ url_for('admin_grades') }}"
+                        class="cancel-btn"
+                    >
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
