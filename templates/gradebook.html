@@ -75,125 +75,29 @@
 
 
     <!-- ==========================================
-         SUBJECT AND SECTION FILTER
-    =========================================== -->
+     SUBJECT INFORMATION
+=========================================== -->
 
-    <form method="GET"
-          action="{{ url_for('gradebook') }}"
-          class="grade-filter">
+<div class="subject-info-card">
 
+    <h2>
+        {{ subject.subject_code }}
+        - 
+        {{ subject.subject_name }}
+    </h2>
 
-        <!-- SUBJECT -->
+    <p>
+        Section {{ subject.section }}
+    </p>
 
-        <div class="filter-group">
-
-            <label for="subject_id">
-
-                Subject
-
-            </label>
-
-
-            <select name="subject_id"
-                    id="subject_id"
-                    required>
-
-
-                <option value="">
-
-                    Select Subject
-
-                </option>
-
-
-                {% for subject in subjects %}
-
-                    <option value="{{ subject.id }}"
-
-                        {% if selected_subject|string == subject.id|string %}
-
-                            selected
-
-                        {% endif %}>
-
-                        {{ subject.subject_code }}
-                        -
-                        {{ subject.subject_name }}
-
-                    </option>
-
-                {% endfor %}
-
-
-            </select>
-
-        </div>
-
-
-
-        <!-- SECTION -->
-
-        <div class="filter-group">
-
-            <label for="section">
-
-                Section
-
-            </label>
-
-
-            <select name="section"
-                    id="section"
-                    required>
-
-
-                <option value="">
-
-                    Select Section
-
-                </option>
-
-
-                {% for section in sections %}
-
-                    <option value="{{ section }}"
-
-                        {% if selected_section == section %}
-
-                            selected
-
-                        {% endif %}>
-
-                        {{ section }}
-
-                    </option>
-
-                {% endfor %}
-
-
-            </select>
-
-        </div>
-
-
-
-        <button type="submit"
-                class="load-btn">
-
-            Load Students
-
-        </button>
-
-
-    </form>
-
+</div>
 
 
     <!-- ==========================================
          GRADE SHEET
     =========================================== -->
 
-    {% if selected_subject and selected_section %}
+    {% if subject %}
 
 
         <form method="POST"
@@ -203,13 +107,8 @@
             <!-- Hidden values -->
 
             <input type="hidden"
-                   name="subject_id"
-                   value="{{ selected_subject }}">
-
-
-            <input type="hidden"
-                   name="section"
-                   value="{{ selected_section }}">
+                name="subject_id"
+                value="{{ subject.id }}">
 
 
             <input type="hidden"
@@ -607,14 +506,12 @@
 
                             <tr>
 
-                                <td colspan="8"
-                                    class="no-students">
+                                <td colspan="8" class="no-students">
 
-                                    No students found
-                                    in this section.
+                                    No students are currently enrolled
+                                    in this subject.
 
                                 </td>
-
                             </tr>
 
 
@@ -673,8 +570,8 @@
 
             <p>
 
-                Select a subject and section
-                to load the students.
+                No students are currently enrolled
+                    in this subject.
 
             </p>
 

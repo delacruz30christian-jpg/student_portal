@@ -1,30 +1,26 @@
 import os
 
+
+
+
+
 from datetime import date
 
 
 
-from flask import (
 
-    Flask,
 
-    render_template,
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 
-    request,
 
-    redirect,
-
-    url_for,
-
-    flash,
-
-    session
-
-)
 
 
 
 from supabase import create_client
+
+
+
+
 
 from dotenv import load_dotenv
 
@@ -34,9 +30,19 @@ from dotenv import load_dotenv
 
 # ==========================================
 
+
+
+
+
 # LOAD ENVIRONMENT VARIABLES
 
+
+
+
+
 # ==========================================
+
+
 
 
 
@@ -44,7 +50,13 @@ load_dotenv()
 
 
 
+
+
 SUPABASE_URL = os.getenv("SUPABASE_URL")
+
+
+
+
 
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
@@ -52,27 +64,33 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 
 
-supabase = create_client(
-
-    SUPABASE_URL,
-
-    SUPABASE_KEY
-
-)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 
 
 
 # ==========================================
+
+
+
+
 
 # FLASK APP
 
+
+
+
+
 # ==========================================
+
+
 
 
 
 app = Flask(__name__)
+
+
 
 
 
@@ -84,9 +102,19 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 # ==========================================
 
+
+
+
+
 # HOME
 
+
+
+
+
 # ==========================================
+
+
 
 
 
@@ -97,8 +125,6 @@ def home():
 
 
     if "user_id" in session:
-
-
 
         if session.get("role") == "teacher":
 
@@ -118,9 +144,19 @@ def home():
 
 # ==========================================
 
+
+
+
+
 # REGISTER
 
+
+
+
+
 # ==========================================
+
+
 
 
 
@@ -132,25 +168,41 @@ def register():
 
     if request.method == "POST":
 
-
-
         student_number = request.form.get("student_number")
+
+
 
         full_name = request.form.get("full_name")
 
+
+
         email = request.form.get("email")
+
+
 
         password = request.form.get("password")
 
+
+
         birthdate = request.form.get("birthdate")
+
+
 
         gender = request.form.get("gender")
 
+
+
         course = request.form.get("course")
+
+
 
         year_level = request.form.get("year_level")
 
+
+
         section = request.form.get("section")
+
+
 
         address = request.form.get("address")
 
@@ -158,17 +210,15 @@ def register():
 
         try:
 
-
-
             # Create account in Supabase Authentication
 
-            auth_response = supabase.auth.sign_up({
 
-                "email": email,
 
-                "password": password
+            auth_response = supabase.auth.sign_up(
 
-            })
+                {"email": email, "password": password}
+
+            )
 
 
 
@@ -178,15 +228,7 @@ def register():
 
             if not user:
 
-
-
-                flash(
-
-                    "Registration failed. Please try again.",
-
-                    "error"
-
-                )
+                flash("Registration failed. Please try again.", "error")
 
 
 
@@ -196,39 +238,39 @@ def register():
 
             # Save student information
 
-            supabase.table("students").insert({
-
-                "user_id": user.id,
-
-                "student_number": student_number,
-
-                "full_name": full_name,
-
-                "email": email,
-
-                "birthdate": birthdate,
-
-                "gender": gender,
-
-                "course": course,
-
-                "year_level": year_level,
-
-                "section": section,
-
-                "address": address
-
-            }).execute()
 
 
+            supabase.table("students").insert(
 
-            flash(
+                {
 
-                "Registration successful! You can now login.",
+                    "user_id": user.id,
 
-                "success"
+                    "student_number": student_number,
 
-            )
+                    "full_name": full_name,
+
+                    "email": email,
+
+                    "birthdate": birthdate,
+
+                    "gender": gender,
+
+                    "course": course,
+
+                    "year_level": year_level,
+
+                    "section": section,
+
+                    "address": address,
+
+                }
+
+            ).execute()
+
+
+
+            flash("Registration successful! You can now login.", "success")
 
 
 
@@ -238,19 +280,11 @@ def register():
 
         except Exception as e:
 
-
-
             print("Registration error:", e)
 
 
 
-            flash(
-
-                "Registration failed. Please check your information.",
-
-                "error"
-
-            )
+            flash("Registration failed. Please check your information.", "error")
 
 
 
@@ -260,11 +294,157 @@ def register():
 
 
 
+@app.route("/teacher/register", methods=["GET", "POST"])
+
+def teacher_register():
+
+
+
+    if request.method == "POST":
+
+        full_name = request.form.get("full_name", "").strip()
+
+        email = request.form.get("email", "").strip().lower()
+
+        password = request.form.get("password", "")
+
+        confirm_password = request.form.get("confirm_password", "")
+
+
+
+        # Check required fields
+
+        if not full_name or not email or not password or not confirm_password:
+
+            flash("Please complete all fields.", "error")
+
+            return render_template("teacher_register.html")
+
+
+
+        # Check password match
+
+        if password != confirm_password:
+
+            flash("Passwords do not match.", "error")
+
+            return render_template("teacher_register.html")
+
+
+
+        # Basic password length check
+
+        if len(password) < 6:
+
+            flash("Password must be at least 6 characters.", "error")
+
+            return render_template("teacher_register.html")
+
+
+
+        try:
+
+            # Create Supabase Auth account
+
+            auth_response = supabase.auth.sign_up(
+
+                {"email": email, "password": password}
+
+            )
+
+
+
+            user = auth_response.user
+
+
+
+            if not user:
+
+                flash("Unable to create teacher account.", "error")
+
+                return render_template("teacher_register.html")
+
+
+
+            # Check if teacher record already exists
+
+            existing_teacher = (
+
+                supabase.table("teachers").select("*").eq("email", email).execute()
+
+            )
+
+
+
+            if existing_teacher.data:
+
+                flash("A teacher account with this email already exists.", "error")
+
+                return render_template("teacher_register.html")
+
+
+
+            # Save teacher information
+
+            supabase.table("teachers").insert(
+
+                {"user_id": user.id, "full_name": full_name, "email": email}
+
+            ).execute()
+
+
+
+            flash("Teacher account created successfully!", "success")
+
+
+
+            return redirect(url_for("login"))
+
+
+
+        except Exception as e:
+
+            print("Teacher registration error:", e)
+
+
+
+            flash(
+
+                "Unable to create teacher account. "
+
+                "The email may already be registered.",
+
+                "error",
+
+            )
+
+
+
+            return render_template("teacher_register.html")
+
+
+
+    return render_template("teacher_register.html")
+
+
+
+
+
 # ==========================================
+
+
+
+
 
 # LOGIN
 
+
+
+
+
 # ==========================================
+
+
 
 
 
@@ -276,9 +456,9 @@ def login():
 
     if request.method == "POST":
 
-
-
         email = request.form.get("email")
+
+
 
         password = request.form.get("password")
 
@@ -286,17 +466,15 @@ def login():
 
         try:
 
-
-
             # Login using Supabase Authentication
 
-            auth_response = supabase.auth.sign_in_with_password({
 
-                "email": email,
 
-                "password": password
+            auth_response = supabase.auth.sign_in_with_password(
 
-            })
+                {"email": email, "password": password}
+
+            )
 
 
 
@@ -306,15 +484,7 @@ def login():
 
             if not user:
 
-
-
-                flash(
-
-                    "Invalid email or password.",
-
-                    "error"
-
-                )
+                flash("Invalid email or password.", "error")
 
 
 
@@ -328,7 +498,11 @@ def login():
 
             # Save session
 
+
+
             session["user_id"] = user_id
+
+
 
             session["email"] = user.email
 
@@ -336,7 +510,11 @@ def login():
 
             # ==========================================
 
+
+
             # CHECK IF TEACHER
+
+
 
             # ==========================================
 
@@ -344,15 +522,7 @@ def login():
 
             teacher_response = (
 
-                supabase
-
-                .table("teachers")
-
-                .select("*")
-
-                .eq("user_id", user_id)
-
-                .execute()
+                supabase.table("teachers").select("*").eq("user_id", user_id).execute()
 
             )
 
@@ -360,23 +530,21 @@ def login():
 
             if teacher_response.data:
 
-
-
                 session["role"] = "teacher"
 
 
 
-                return redirect(
-
-                    url_for("teacher_dashboard")
-
-                )
+                return redirect(url_for("teacher_dashboard"))
 
 
 
             # ==========================================
 
+
+
             # OTHERWISE STUDENT
+
+
 
             # ==========================================
 
@@ -386,29 +554,17 @@ def login():
 
 
 
-            return redirect(
-
-                url_for("student_dashboard")
-
-            )
+            return redirect(url_for("student_dashboard"))
 
 
 
         except Exception as e:
 
-
-
             print("Login error:", e)
 
 
 
-            flash(
-
-                "Invalid email or password.",
-
-                "error"
-
-            )
+            flash("Invalid email or password.", "error")
 
 
 
@@ -418,17 +574,193 @@ def login():
 
 
 
+
+
+
+
+
+
 # ==========================================
 
+# ==========================================
 # STUDENT DASHBOARD
-
 # ==========================================
-
-
 
 @app.route("/student/dashboard")
-
 def student_dashboard():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") == "teacher":
+        return redirect(url_for("teacher_dashboard"))
+
+    user_id = session["user_id"]
+
+    try:
+        student_response = (
+            supabase.table("students")
+            .select("*")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+
+        student = student_response.data
+
+        if not student:
+            flash("Student information not found.", "error")
+            return redirect(url_for("login"))
+
+        birthdate = student.get("birthdate")
+
+        if birthdate:
+            if isinstance(birthdate, str):
+                birth_year, birth_month, birth_day = map(
+                    int, birthdate.split("-")
+                )
+            else:
+                birth_year = birthdate.year
+                birth_month = birthdate.month
+                birth_day = birthdate.day
+
+            today = date.today()
+            age = today.year - birth_year
+
+            if (today.month, today.day) < (birth_month, birth_day):
+                age -= 1
+        else:
+            age = None
+
+        student["age"] = age
+        student_id = student["id"]
+
+        enrollments_response = (
+            supabase.table("enrollments")
+            .select("*")
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        enrollments = enrollments_response.data or []
+
+        subjects_response = (
+            supabase.table("subjects")
+            .select("*")
+            .execute()
+        )
+
+        subjects = {
+            subject["id"]: subject
+            for subject in (subjects_response.data or [])
+        }
+
+        teachers_response = (
+            supabase.table("teachers")
+            .select("*")
+            .execute()
+        )
+
+        teachers = {
+            teacher["id"]: teacher
+            for teacher in (teachers_response.data or [])
+        }
+
+        grades_response = (
+            supabase.table("grades")
+            .select("*")
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        grades = {
+            grade["subject_id"]: grade
+            for grade in (grades_response.data or [])
+        }
+
+        enrolled_subjects = []
+
+        for enrollment in enrollments:
+
+            subject_id = enrollment["subject_id"]
+            subject = subjects.get(subject_id)
+
+            if not subject:
+                continue
+
+            teacher = teachers.get(subject.get("teacher_id"))
+            grade = grades.get(subject_id)
+
+            enrolled_subjects.append(
+                {
+                    "id": subject["id"],
+                    "subject_code": subject.get("subject_code"),
+                    "subject_name": subject.get("subject_name"),
+                    "section": (
+                        enrollment.get("section")
+                        or subject.get("section")
+                    ),
+                    "teacher_name": (
+                        teacher.get("full_name")
+                        if teacher
+                        else "-"
+                    ),
+                    "prelim": (
+                        grade.get("prelim")
+                        if grade
+                        else None
+                    ),
+                    "midterm": (
+                        grade.get("midterm")
+                        if grade
+                        else None
+                    ),
+                    "finals": (
+                        grade.get("finals")
+                        if grade
+                        else None
+                    ),
+                    "average": (
+                        grade.get("average")
+                        if grade
+                        else None
+                    ),
+                }
+            )
+
+        enrolled_subjects.sort(
+            key=lambda x: x["subject_code"] or ""
+        )
+
+        return render_template(
+            "student_dashboard.html",
+            student=student,
+            age=age,
+            enrolled_subjects=enrolled_subjects,
+        )
+
+    except Exception as e:
+        print("Student dashboard error:", e)
+
+        flash(
+            "Unable to load student information.",
+            "error"
+        )
+
+        return redirect(url_for("login"))
+
+
+# STUDENT SUBJECTS
+
+# ==========================================
+
+
+
+
+
+@app.route("/student/subjects", methods=["GET", "POST"])
+
+def student_subjects():
 
 
 
@@ -438,7 +770,7 @@ def student_dashboard():
 
 
 
-    if session.get("role") == "teacher":
+    if session.get("role") != "student":
 
         return redirect(url_for("teacher_dashboard"))
 
@@ -450,11 +782,9 @@ def student_dashboard():
 
     try:
 
-
-
         # ==========================================
 
-        # GET STUDENT INFORMATION
+        # GET CURRENT STUDENT
 
         # ==========================================
 
@@ -462,9 +792,7 @@ def student_dashboard():
 
         student_response = (
 
-            supabase
-
-            .table("students")
+            supabase.table("students")
 
             .select("*")
 
@@ -484,15 +812,7 @@ def student_dashboard():
 
         if not student:
 
-
-
-            flash(
-
-                "Student information not found.",
-
-                "error"
-
-            )
+            flash("Student information not found.", "error")
 
 
 
@@ -500,99 +820,239 @@ def student_dashboard():
 
 
 
-        # ==========================================
-
-        # CALCULATE STUDENT AGE
-
-        # ==========================================
-
-
-
-        birthdate = student.get("birthdate")
-
-
-
-        if birthdate:
-
-
-
-            if isinstance(birthdate, str):
-
-
-
-                birth_year, birth_month, birth_day = map(
-
-                    int,
-
-                    birthdate.split("-")
-
-                )
-
-
-
-            else:
-
-
-
-                birth_year = birthdate.year
-
-                birth_month = birthdate.month
-
-                birth_day = birthdate.day
-
-
-
-            today = date.today()
-
-
-
-            age = today.year - birth_year
-
-
-
-            if (today.month, today.day) < (
-
-                birth_month,
-
-                birth_day
-
-            ):
-
-                age -= 1
-
-
-
-        else:
-
-             age = None
-
-
-
-        # Add calculated age to student data
-
-        student["age"] = age
-
-
-
         student_id = student["id"]
 
 
 
+        # ==========================================
+
+        # ENROLL SUBJECT
+
+        # ==========================================
+
+
+
+        if request.method == "POST":
+
+            subject_id = request.form.get("subject_id")
+
+
+
+            if not subject_id:
+
+                flash("Please select a subject.", "error")
+
+
+
+                return redirect(url_for("student_subjects"))
+
+
+
+            subject_response = (
+
+                supabase.table("subjects")
+
+                .select("*")
+
+                .eq("id", int(subject_id))
+
+                .single()
+
+                .execute()
+
+            )
+
+
+
+            subject = subject_response.data
+
+
+
+            if not subject:
+
+                flash("Subject not found.", "error")
+
+
+
+                return redirect(url_for("student_subjects"))
+
+
+
+            # Only teacher-created subjects
+
+            # with section are available
+
+
+
+            if not subject.get("teacher_id") or not subject.get("section"):
+
+                flash("This subject is not available for enrollment.", "error")
+
+
+
+                return redirect(url_for("student_subjects"))
+
+
+
+            # ==========================================
+
+            # CHECK IF ALREADY ENROLLED
+
+            # ==========================================
+
+
+
+            existing_response = (
+
+                supabase.table("enrollments")
+
+                .select("*")
+
+                .eq("student_id", student_id)
+
+                .eq("subject_id", int(subject_id))
+
+                .execute()
+
+            )
+
+
+
+            if existing_response.data:
+
+                flash("You are already enrolled in this subject.", "error")
+
+
+
+                return redirect(url_for("student_subjects"))
+
+
+
+            # ==========================================
+
+            # SAVE ENROLLMENT
+
+            # ==========================================
+
+
+
+            supabase.table("enrollments").insert(
+
+                {
+
+                    "student_id": student_id,
+
+                    "subject_id": int(subject_id),
+
+                    "section": subject.get("section"),
+
+                }
+
+            ).execute()
+
+
+
+            flash("Subject enrolled successfully!", "success")
+
+
+
+            return redirect(url_for("student_subjects"))
+
 
 
         # ==========================================
 
-        # GET STUDENT GRADES
+        # GET ALL SUBJECTS
 
         # ==========================================
 
 
 
-        grades_response = (
+        subjects_response = (
 
-            supabase
+            supabase.table("subjects").select("*").order("subject_code").execute()
 
-            .table("grades")
+        )
+
+
+
+        all_subjects = subjects_response.data or []
+
+
+
+        # ==========================================
+
+        # GET TEACHERS
+
+        # ==========================================
+
+
+
+        teachers_response = supabase.table("teachers").select("*").execute()
+
+
+
+        teachers = {
+
+            teacher["id"]: teacher for teacher in (teachers_response.data or [])
+
+        }
+
+
+
+        # ==========================================
+
+        # ADD TEACHER NAME TO SUBJECTS
+
+        # ==========================================
+
+
+
+        subjects = []
+
+
+
+        for subject in all_subjects:
+
+            # Only teacher-created subjects
+
+            if not subject.get("teacher_id"):
+
+                continue
+
+
+
+            # Only subjects with section
+
+            if not subject.get("section"):
+
+                continue
+
+
+
+            teacher = teachers.get(subject.get("teacher_id"))
+
+
+
+            subject["teacher_name"] = teacher.get("full_name") if teacher else "-"
+
+
+
+            subjects.append(subject)
+
+
+
+        # ==========================================
+
+        # GET STUDENT ENROLLMENTS
+
+        # ==========================================
+
+
+
+        enrollments_response = (
+
+            supabase.table("enrollments")
 
             .select("*")
 
@@ -604,37 +1064,9 @@ def student_dashboard():
 
 
 
-        grades_data = grades_response.data or []
+        enrolled_ids = {
 
-
-
-        # ==========================================
-
-        # GET SUBJECTS
-
-        # ==========================================
-
-
-
-        subjects_response = (
-
-            supabase
-
-            .table("subjects")
-
-            .select("*")
-
-            .execute()
-
-        )
-
-
-
-        subjects = {
-
-            subject["id"]: subject
-
-            for subject in (subjects_response.data or [])
+            enrollment["subject_id"] for enrollment in (enrollments_response.data or [])
 
         }
 
@@ -642,69 +1074,21 @@ def student_dashboard():
 
         # ==========================================
 
-        # COMBINE GRADES + SUBJECT INFORMATION
+        # DISPLAY PAGE
 
         # ==========================================
 
 
 
-        student_grades = []
-
-
-
-        for grade in grades_data:
-
-
-
-            subject = subjects.get(
-
-                grade["subject_id"]
-
-            )
-
-
-
-            if subject:
-
-
-
-                student_grades.append({
-
-                    "subject_code": subject["subject_code"],
-
-                    "subject_name": subject["subject_name"],
-
-                    "prelim": grade["prelim"],
-
-                    "midterm": grade["midterm"],
-
-                    "finals": grade["finals"],
-
-                    "average": grade["average"]
-
-                })
-
-
-
-        # Sort by subject code
-
-        student_grades.sort(
-
-            key=lambda x: x["subject_code"]
-
-        )
-
-
-
         return render_template(
 
-            "student_dashboard.html",
+            "student_subjects.html",
+
+            subjects=subjects,
+
+            enrolled_ids=enrolled_ids,
 
             student=student,
-
-            age=age,
-
-            grades=student_grades
 
         )
 
@@ -712,45 +1096,220 @@ def student_dashboard():
 
     except Exception as e:
 
-
-
-        print(
-
-            "Student dashboard error:",
-
-            e
-
-        )
+        print("Student subjects error:", e)
 
 
 
-        flash(
-
-            "Unable to load student information.",
-
-            "error"
-
-        )
+        flash("Unable to load subjects.", "error")
 
 
+
+        return redirect(url_for("student_dashboard"))
+
+
+
+
+
+# ==========================================
+
+# REMOVE STUDENT ENROLLMENT
+
+# ==========================================
+
+
+
+
+
+@app.route("/student/subjects/<int:subject_id>/remove", methods=["POST"])
+
+def student_remove_subject(subject_id):
+
+
+
+    if "user_id" not in session:
 
         return redirect(url_for("login"))
 
 
 
+    if session.get("role") != "student":
+
+        return redirect(url_for("teacher_dashboard"))
+
+
+
+    try:
+
+        # ==========================================
+
+        # GET CURRENT STUDENT
+
+        # ==========================================
+
+
+
+        student_response = (
+
+            supabase.table("students")
+
+            .select("*")
+
+            .eq("user_id", session["user_id"])
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        student = student_response.data
+
+
+
+        if not student:
+
+            flash("Student information not found.", "error")
+
+
+
+            return redirect(url_for("login"))
+
+
+
+        student_id = student["id"]
+
+
+
+        # ==========================================
+
+        # CHECK ENROLLMENT
+
+        # ==========================================
+
+
+
+        enrollment_response = (
+
+            supabase.table("enrollments")
+
+            .select("*")
+
+            .eq("student_id", student_id)
+
+            .eq("subject_id", subject_id)
+
+            .execute()
+
+        )
+
+
+
+        if not enrollment_response.data:
+
+            flash("You are not enrolled in this subject.", "error")
+
+
+
+            return redirect(url_for("student_dashboard"))
+
+
+
+        # ==========================================
+
+        # REMOVE ENROLLMENT ONLY
+
+        # ==========================================
+
+
+
+        supabase.table("enrollments").delete().eq("student_id", student_id).eq(
+
+            "subject_id", subject_id
+
+        ).execute()
+
+
+
+        flash("Subject enrollment removed successfully.", "success")
+
+
+
+        return redirect(url_for("student_dashboard"))
+
+
+
+    except Exception as e:
+
+        print("Student remove subject error:", e)
+
+
+
+        flash("Unable to remove subject enrollment.", "error")
+
+
+
+        return redirect(url_for("student_dashboard"))
+
 
 
 # ==========================================
-
 # TEACHER DASHBOARD
-
 # ==========================================
-
-
 
 @app.route("/teacher/dashboard")
-
 def teacher_dashboard():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        return redirect(url_for("student_dashboard"))
+
+    user_id = session["user_id"]
+
+    try:
+        response = (
+            supabase.table("teachers")
+            .select("*")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+
+        teacher = response.data
+
+        if not teacher:
+            flash("Teacher account not found.", "error")
+            return redirect(url_for("login"))
+
+        return render_template(
+            "teacher_dashboard.html",
+            teacher=teacher
+        )
+
+    except Exception as e:
+        print("Teacher dashboard error:", e)
+        flash("Unable to load teacher information.", "error")
+        return redirect(url_for("login"))
+
+
+# TEACHER ADD SUBJECT
+
+
+
+
+
+# ==========================================
+
+
+
+
+
+@app.route("/teacher/subjects", methods=["GET", "POST"])
+
+def teacher_subjects():
 
 
 
@@ -762,11 +1321,7 @@ def teacher_dashboard():
 
     if session.get("role") != "teacher":
 
-        return redirect(
-
-            url_for("student_dashboard")
-
-        )
+        return redirect(url_for("student_dashboard"))
 
 
 
@@ -776,13 +1331,13 @@ def teacher_dashboard():
 
     try:
 
+        # GET CURRENT TEACHER
 
 
-        response = (
 
-            supabase
+        teacher_response = (
 
-            .table("teachers")
+            supabase.table("teachers")
 
             .select("*")
 
@@ -796,15 +1351,157 @@ def teacher_dashboard():
 
 
 
-        teacher = response.data
+        teacher = teacher_response.data
+
+
+
+        if not teacher:
+
+            flash("Teacher account not found.", "error")
+
+
+
+            return redirect(url_for("login"))
+
+
+
+        teacher_id = teacher["id"]
+
+
+
+        # ==========================================
+
+
+
+        # ADD SUBJECT
+
+
+
+        # ==========================================
+
+
+
+        if request.method == "POST":
+
+            subject_code = request.form.get("subject_code", "").strip().upper()
+
+
+
+            subject_name = request.form.get("subject_name", "").strip()
+
+
+
+            section = request.form.get("section", "").strip().upper()
+
+
+
+            if not subject_code or not subject_name or not section:
+
+                flash("Please complete all fields.", "error")
+
+
+
+                return redirect(url_for("teacher_subjects"))
+
+
+
+            # CHECK DUPLICATE
+
+
+
+            existing_response = (
+
+                supabase.table("subjects")
+
+                .select("id")
+
+                .eq("teacher_id", teacher_id)
+
+                .eq("subject_code", subject_code)
+
+                .eq("section", section)
+
+                .execute()
+
+            )
+
+
+
+            if existing_response.data:
+
+                flash("You already added this subject and section.", "error")
+
+
+
+                return redirect(url_for("teacher_subjects"))
+
+
+
+            # INSERT SUBJECT
+
+
+
+            supabase.table("subjects").insert(
+
+                {
+
+                    "subject_code": subject_code,
+
+                    "subject_name": subject_name,
+
+                    "teacher_id": teacher_id,
+
+                    "section": section,
+
+                }
+
+            ).execute()
+
+
+
+            flash("Subject added successfully.", "success")
+
+
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        # ==========================================
+
+
+
+        # GET TEACHER SUBJECTS
+
+
+
+        # ==========================================
+
+
+
+        subjects_response = (
+
+            supabase.table("subjects")
+
+            .select("*")
+
+            .eq("teacher_id", teacher_id)
+
+            .order("subject_code")
+
+            .execute()
+
+        )
+
+
+
+        subjects = subjects_response.data or []
 
 
 
         return render_template(
 
-            "teacher_dashboard.html",
-
-            teacher=teacher
+            "teacher_subjects.html", teacher=teacher, subjects=subjects
 
         )
 
@@ -812,33 +1509,485 @@ def teacher_dashboard():
 
     except Exception as e:
 
-
-
-        print("Teacher dashboard error:", e)
+        print("Teacher subjects error:", e)
 
 
 
-        flash(
-
-            "Unable to load teacher information.",
-
-            "error"
-
-        )
+        flash("Unable to load subjects.", "error")
 
 
+
+        return redirect(url_for("teacher_dashboard"))
+
+
+
+
+
+# ==========================================
+
+
+
+
+
+# ==========================================
+
+
+
+# TEACHER SUBJECT GRADEBOOK
+
+
+
+# ==========================================
+
+
+
+
+
+@app.route("/teacher/subjects/<int:subject_id>")
+
+def teacher_subject_gradebook(subject_id):
+
+
+
+    if "user_id" not in session:
 
         return redirect(url_for("login"))
 
 
 
+    if session.get("role") != "teacher":
+
+        return redirect(url_for("student_dashboard"))
 
 
-# ==========================================
+
+    try:
+
+        teacher_response = (
+
+            supabase.table("teachers")
+
+            .select("*")
+
+            .eq("user_id", session["user_id"])
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        teacher = teacher_response.data
+
+
+
+        if not teacher:
+
+            flash("Teacher account not found.", "error")
+
+
+
+            return redirect(url_for("login"))
+
+
+
+        subject_response = (
+
+            supabase.table("subjects")
+
+            .select("*")
+
+            .eq("id", subject_id)
+
+            .eq("teacher_id", teacher["id"])
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        subject = subject_response.data
+
+
+
+        if not subject:
+
+            flash("You are not allowed to access this subject.", "error")
+
+
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        return redirect(
+
+            url_for("gradebook", subject_id=subject["id"], section=subject["section"])
+
+        )
+
+
+
+    except Exception as e:
+
+        print("Teacher subject gradebook error:", e)
+
+
+
+        flash("Unable to open subject.", "error")
+
+
+
+        return redirect(url_for("teacher_subjects"))
+
+
+
+
+
+@app.route("/teacher/subjects/<int:subject_id>/edit", methods=["GET", "POST"])
+
+def teacher_edit_subject(subject_id):
+
+
+
+    if "user_id" not in session:
+
+        return redirect(url_for("login"))
+
+
+
+    if session.get("role") != "teacher":
+
+        return redirect(url_for("student_dashboard"))
+
+
+
+    try:
+
+        # Get current teacher
+
+        teacher_response = (
+
+            supabase.table("teachers")
+
+            .select("*")
+
+            .eq("user_id", session["user_id"])
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        teacher = teacher_response.data
+
+
+
+        if not teacher:
+
+            flash("Teacher account not found.", "error")
+
+            return redirect(url_for("login"))
+
+
+
+        teacher_id = teacher["id"]
+
+
+
+        # Get subject and verify ownership
+
+        subject_response = (
+
+            supabase.table("subjects")
+
+            .select("*")
+
+            .eq("id", subject_id)
+
+            .eq("teacher_id", teacher_id)
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        subject = subject_response.data
+
+
+
+        if not subject:
+
+            flash("Subject not found or you are not allowed to edit it.", "error")
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        # UPDATE
+
+        if request.method == "POST":
+
+            subject_code = request.form.get("subject_code", "").strip().upper()
+
+
+
+            subject_name = request.form.get("subject_name", "").strip()
+
+
+
+            section = request.form.get("section", "").strip().upper()
+
+
+
+            if not subject_code or not subject_name or not section:
+
+                flash("Please complete all fields.", "error")
+
+
+
+                return render_template("teacher_edit_subject.html", subject=subject)
+
+
+
+            if section not in ["A", "B"]:
+
+                flash("Invalid section.", "error")
+
+
+
+                return render_template("teacher_edit_subject.html", subject=subject)
+
+
+
+            # Check duplicate subject
+
+            duplicate_response = (
+
+                supabase.table("subjects")
+
+                .select("*")
+
+                .eq("teacher_id", teacher_id)
+
+                .eq("subject_code", subject_code)
+
+                .eq("section", section)
+
+                .neq("id", subject_id)
+
+                .execute()
+
+            )
+
+
+
+            if duplicate_response.data:
+
+                flash("You already have this subject code and section.", "error")
+
+
+
+                return render_template("teacher_edit_subject.html", subject=subject)
+
+
+
+            # Update subject
+
+            supabase.table("subjects").update(
+
+                {
+
+                    "subject_code": subject_code,
+
+                    "subject_name": subject_name,
+
+                    "section": section,
+
+                }
+
+            ).eq("id", subject_id).eq("teacher_id", teacher_id).execute()
+
+
+
+            # Keep enrollment section synchronized
+
+            supabase.table("enrollments").update({"section": section}).eq(
+
+                "subject_id", subject_id
+
+            ).execute()
+
+
+
+            flash("Subject updated successfully!", "success")
+
+
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        return render_template("teacher_edit_subject.html", subject=subject)
+
+
+
+    except Exception as e:
+
+        print("Teacher edit subject error:", e)
+
+
+
+        flash("Unable to edit subject.", "error")
+
+
+
+        return redirect(url_for("teacher_subjects"))
+
+
+
+
+
+@app.route("/teacher/subjects/<int:subject_id>/delete", methods=["POST"])
+
+def teacher_delete_subject(subject_id):
+
+
+
+    if "user_id" not in session:
+
+        return redirect(url_for("login"))
+
+
+
+    if session.get("role") != "teacher":
+
+        return redirect(url_for("student_dashboard"))
+
+
+
+    try:
+
+        # Get current teacher
+
+        teacher_response = (
+
+            supabase.table("teachers")
+
+            .select("*")
+
+            .eq("user_id", session["user_id"])
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        teacher = teacher_response.data
+
+
+
+        if not teacher:
+
+            flash("Teacher account not found.", "error")
+
+            return redirect(url_for("login"))
+
+
+
+        teacher_id = teacher["id"]
+
+
+
+        # Verify subject belongs to current teacher
+
+        subject_response = (
+
+            supabase.table("subjects")
+
+            .select("*")
+
+            .eq("id", subject_id)
+
+            .eq("teacher_id", teacher_id)
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        subject = subject_response.data
+
+
+
+        if not subject:
+
+            flash("Subject not found or you are not allowed to delete it.", "error")
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        # Delete subject
+
+        supabase.table("subjects").delete().eq("id", subject_id).eq(
+
+            "teacher_id", teacher_id
+
+        ).execute()
+
+
+
+        flash("Subject deleted successfully.", "success")
+
+
+
+        return redirect(url_for("teacher_subjects"))
+
+
+
+    except Exception as e:
+
+        print("Teacher delete subject error:", e)
+
+
+
+        flash("Unable to delete subject.", "error")
+
+
+
+        return redirect(url_for("teacher_subjects"))
+
+
+
+
 
 # TEACHER GRADEBOOK
 
+
+
+
+
 # ==========================================
+
+
 
 
 
@@ -862,25 +2011,23 @@ def gradebook():
 
     try:
 
+        # ==========================================
 
+        # GET CURRENT TEACHER
 
         # ==========================================
 
-        # GET SUBJECTS
-
-        # ==========================================
 
 
+        teacher_response = (
 
-        subjects_response = (
-
-            supabase
-
-            .table("subjects")
+            supabase.table("teachers")
 
             .select("*")
 
-            .order("subject_code")
+            .eq("user_id", session["user_id"])
+
+            .single()
 
             .execute()
 
@@ -888,7 +2035,127 @@ def gradebook():
 
 
 
-        subjects = subjects_response.data or []
+        teacher = teacher_response.data
+
+
+
+        if not teacher:
+
+            flash("Teacher account not found.", "error")
+
+            return redirect(url_for("login"))
+
+
+
+        teacher_id = teacher["id"]
+
+
+
+        # ==========================================
+
+        # GET SELECTED SUBJECT
+
+        # ==========================================
+
+
+
+        selected_subject = request.form.get("subject_id") or request.args.get(
+
+            "subject_id"
+
+        )
+
+
+
+        if not selected_subject:
+
+            flash("Please select a subject first.", "error")
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        selected_subject = int(selected_subject)
+
+
+
+        # ==========================================
+
+        # GET SUBJECT OWNED BY CURRENT TEACHER
+
+        # ==========================================
+
+
+
+        subject_response = (
+
+            supabase.table("subjects")
+
+            .select("*")
+
+            .eq("id", selected_subject)
+
+            .eq("teacher_id", teacher_id)
+
+            .single()
+
+            .execute()
+
+        )
+
+
+
+        subject = subject_response.data
+
+
+
+        if not subject:
+
+            flash("You are not allowed to access this subject.", "error")
+
+            return redirect(url_for("teacher_subjects"))
+
+
+
+        # ==========================================
+
+        # AUTOMATIC SUBJECT INFORMATION
+
+        # ==========================================
+
+
+
+        selected_section = subject.get("section")
+
+
+
+        # ==========================================
+
+        # GET ENROLLED STUDENTS
+
+        # ==========================================
+
+
+
+        enrollments_response = (
+
+            supabase.table("enrollments")
+
+            .select("*")
+
+            .eq("subject_id", selected_subject)
+
+            .execute()
+
+        )
+
+
+
+        enrollments = enrollments_response.data or []
+
+
+
+        enrolled_student_ids = {enrollment["student_id"] for enrollment in enrollments}
 
 
 
@@ -902,15 +2169,9 @@ def gradebook():
 
         students_response = (
 
-            supabase
+            supabase.table("students")
 
-            .table("students")
-
-            .select(
-
-                "id, student_number, full_name, course, year_level, section"
-
-            )
+            .select("id, student_number, full_name, course, year_level, section")
 
             .order("full_name")
 
@@ -926,57 +2187,17 @@ def gradebook():
 
         # ==========================================
 
-        # GET SECTIONS
+        # ONLY ENROLLED STUDENTS
 
         # ==========================================
 
 
 
-        sections = sorted(
+        students = [
 
-            list(
+            student for student in all_students if student["id"] in enrolled_student_ids
 
-                set(
-
-                    student.get("section")
-
-                    for student in all_students
-
-                    if student.get("section")
-
-                )
-
-            )
-
-        )
-
-
-
-        # ==========================================
-
-        # SELECTED SUBJECT AND SECTION
-
-        # ==========================================
-
-
-
-        selected_subject = (
-
-            request.form.get("subject_id")
-
-            or request.args.get("subject_id")
-
-        )
-
-
-
-        selected_section = (
-
-            request.form.get("section")
-
-            or request.args.get("section")
-
-        )
+        ]
 
 
 
@@ -988,33 +2209,7 @@ def gradebook():
 
 
 
-        if (
-
-            request.method == "POST"
-
-            and request.form.get("action") == "save"
-
-        ):
-
-
-
-            if not selected_subject or not selected_section:
-
-
-
-                flash(
-
-                    "Please select a subject and section.",
-
-                    "error"
-
-                )
-
-
-
-                return redirect(url_for("gradebook"))
-
-
+        if request.method == "POST" and request.form.get("action") == "save":
 
             valid_grades = [
 
@@ -1036,53 +2231,29 @@ def gradebook():
 
                 "3.00",
 
-                "5.00"
+                "5.00",
 
             ]
 
 
 
-            students_in_section = [
+            # Only save enrolled students
 
-                student
-
-                for student in all_students
-
-                if student.get("section") == selected_section
-
-            ]
-
-
-
-            for student in students_in_section:
-
-
+            for student in students:
 
                 student_id = student["id"]
 
 
 
-                prelim = request.form.get(
-
-                    f"prelim_{student_id}"
-
-                )
+                prelim = request.form.get(f"prelim_{student_id}")
 
 
 
-                midterm = request.form.get(
-
-                    f"midterm_{student_id}"
-
-                )
+                midterm = request.form.get(f"midterm_{student_id}")
 
 
 
-                finals = request.form.get(
-
-                    f"finals_{student_id}"
-
-                )
+                finals = request.form.get(f"finals_{student_id}")
 
 
 
@@ -1094,37 +2265,25 @@ def gradebook():
 
 
 
-                # VALIDATE
+                # ==========================================
+
+                # VALIDATE GRADES
+
+                # ==========================================
+
+
 
                 for grade in [prelim, midterm, finals]:
 
-
-
                     if grade and grade not in valid_grades:
 
-
-
-                        flash(
-
-                            f"Invalid grade for {student['full_name']}.",
-
-                            "error"
-
-                        )
+                        flash(f"Invalid grade for {student['full_name']}.", "error")
 
 
 
                         return redirect(
 
-                            url_for(
-
-                                "gradebook",
-
-                                subject_id=selected_subject,
-
-                                section=selected_section
-
-                            )
+                            url_for("gradebook", subject_id=selected_subject)
 
                         )
 
@@ -1140,15 +2299,13 @@ def gradebook():
 
                 existing_response = (
 
-                    supabase
-
-                    .table("grades")
+                    supabase.table("grades")
 
                     .select("*")
 
                     .eq("student_id", student_id)
 
-                    .eq("subject_id", int(selected_subject))
+                    .eq("subject_id", selected_subject)
 
                     .execute()
 
@@ -1156,23 +2313,27 @@ def gradebook():
 
 
 
-                if existing_response.data:
+                existing_grade = (
+
+                    existing_response.data[0] if existing_response.data else None
+
+                )
 
 
 
-                    existing_grade = existing_response.data[0]
+                # ==========================================
+
+                # GET FINAL VALUES
+
+                # ==========================================
 
 
 
-                    # Keep existing value when field is blank
+                if existing_grade:
 
                     final_prelim = (
 
-                        float(prelim)
-
-                        if prelim
-
-                        else existing_grade.get("prelim")
+                        float(prelim) if prelim else existing_grade.get("prelim")
 
                     )
 
@@ -1180,11 +2341,7 @@ def gradebook():
 
                     final_midterm = (
 
-                        float(midterm)
-
-                        if midterm
-
-                        else existing_grade.get("midterm")
+                        float(midterm) if midterm else existing_grade.get("midterm")
 
                     )
 
@@ -1192,101 +2349,7 @@ def gradebook():
 
                     final_finals = (
 
-                        float(finals)
-
-                        if finals
-
-                        else existing_grade.get("finals")
-
-                    )
-
-
-
-                    # Calculate average
-
-                    numeric_grades = []
-
-
-
-                    for grade in [
-
-                        final_prelim,
-
-                        final_midterm,
-
-                        final_finals
-
-                    ]:
-
-
-
-                        if grade is not None:
-
-                            numeric_grades.append(
-
-                                float(grade)
-
-                            )
-
-
-
-                    average = None
-
-
-
-                    if numeric_grades:
-
-
-
-                        raw_average = (
-
-                            sum(numeric_grades)
-
-                            / len(numeric_grades)
-
-                        )
-
-
-
-                        average = round(
-
-                            raw_average * 4
-
-                        ) / 4
-
-
-
-                    grade_data = {
-
-                        "prelim": final_prelim,
-
-                        "midterm": final_midterm,
-
-                        "finals": final_finals,
-
-                        "average": average
-
-                    }
-
-
-
-                    (
-
-                        supabase
-
-                        .table("grades")
-
-                        .update(grade_data)
-
-                        .eq(
-
-                            "id",
-
-                            existing_grade["id"]
-
-                        )
-
-                        .execute()
+                        float(finals) if finals else existing_grade.get("finals")
 
                     )
 
@@ -1294,117 +2357,93 @@ def gradebook():
 
                 else:
 
-
-
-                    # ==========================================
-
-                    # NEW GRADE
-
-                    # ==========================================
+                    final_prelim = float(prelim) if prelim else None
 
 
 
-                    numeric_grades = []
+                    final_midterm = float(midterm) if midterm else None
 
 
 
-                    for grade in [
-
-                        prelim,
-
-                        midterm,
-
-                        finals
-
-                    ]:
+                    final_finals = float(finals) if finals else None
 
 
 
-                        if grade:
+                # ==========================================
 
-                            numeric_grades.append(
+                # CALCULATE AVERAGE
 
-                                float(grade)
-
-                            )
+                # ==========================================
 
 
 
-                    average = None
+                numeric_grades = []
 
 
 
-                    if numeric_grades:
+                for grade in [final_prelim, final_midterm, final_finals]:
+
+                    if grade is not None:
+
+                        numeric_grades.append(float(grade))
 
 
 
-                        raw_average = (
-
-                            sum(numeric_grades)
-
-                            / len(numeric_grades)
-
-                        )
+                average = None
 
 
 
-                        average = round(
+                if numeric_grades:
 
-                            raw_average * 4
-
-                        ) / 4
+                    raw_average = sum(numeric_grades) / len(numeric_grades)
 
 
 
-                    grade_data = {
+                    # Round to nearest 0.25
 
-                        "student_id": student_id,
-
-                        "subject_id": int(selected_subject),
-
-                        "prelim": (
-
-                            float(prelim)
-
-                            if prelim
-
-                            else None
-
-                        ),
-
-                        "midterm": (
-
-                            float(midterm)
-
-                            if midterm
-
-                            else None
-
-                        ),
-
-                        "finals": (
-
-                            float(finals)
-
-                            if finals
-
-                            else None
-
-                        ),
-
-                        "average": average
-
-                    }
+                    average = round(raw_average * 4) / 4
 
 
+
+                # ==========================================
+
+                # GRADE DATA
+
+                # ==========================================
+
+
+
+                grade_data = {
+
+                    "prelim": final_prelim,
+
+                    "midterm": final_midterm,
+
+                    "finals": final_finals,
+
+                    "average": average,
+
+                }
+
+
+
+                # ==========================================
+
+                # UPDATE EXISTING GRADE
+
+                # ==========================================
+
+
+
+                if existing_grade:
 
                     (
 
-                        supabase
+                        supabase.table("grades")
 
-                        .table("grades")
+                        .update(grade_data)
 
-                        .insert(grade_data)
+                        .eq("id", existing_grade["id"])
 
                         .execute()
 
@@ -1412,55 +2451,31 @@ def gradebook():
 
 
 
-            flash(
+                # ==========================================
 
-                "All grades saved successfully!",
+                # INSERT NEW GRADE
 
-                "success"
-
-            )
+                # ==========================================
 
 
 
-            return redirect(
+                else:
 
-                url_for(
+                    grade_data["student_id"] = student_id
 
-                    "gradebook",
-
-                    subject_id=selected_subject,
-
-                    section=selected_section
-
-                )
-
-            )
+                    grade_data["subject_id"] = selected_subject
 
 
 
-        # ==========================================
-
-        # FILTER STUDENTS
-
-        # ==========================================
+                    (supabase.table("grades").insert(grade_data).execute())
 
 
 
-        students = [
+            flash("All grades saved successfully!", "success")
 
-            student
 
-            for student in all_students
 
-            if (
-
-                not selected_section
-
-                or student.get("section") == selected_section
-
-            )
-
-        ]
+            return redirect(url_for("gradebook", subject_id=selected_subject))
 
 
 
@@ -1476,41 +2491,31 @@ def gradebook():
 
 
 
-        if selected_subject:
+        grades_response = (
+
+            supabase.table("grades")
+
+            .select("*")
+
+            .eq("subject_id", selected_subject)
+
+            .execute()
+
+        )
 
 
 
-            grades_response = (
+        for grade in grades_response.data or []:
 
-                supabase
-
-                .table("grades")
-
-                .select("*")
-
-                .eq(
-
-                    "subject_id",
-
-                    int(selected_subject)
-
-                )
-
-                .execute()
-
-            )
+            grades[grade["student_id"]] = grade
 
 
 
-            for grade in grades_response.data or []:
+        # ==========================================
 
+        # DISPLAY GRADEBOOK
 
-
-                grades[
-
-                    grade["student_id"]
-
-                ] = grade
+        # ==========================================
 
 
 
@@ -1518,17 +2523,21 @@ def gradebook():
 
             "gradebook.html",
 
-            subjects=subjects,
+            # Subject information
 
-            sections=sections,
-
-            students=students,
-
-            grades=grades,
+            subject=subject,
 
             selected_subject=selected_subject,
 
-            selected_section=selected_section
+            selected_section=selected_section,
+
+            # Students
+
+            students=students,
+
+            # Grades
+
+            grades=grades,
 
         )
 
@@ -1536,37 +2545,35 @@ def gradebook():
 
     except Exception as e:
 
-
-
         print("Gradebook error:", e)
 
 
 
-        flash(
-
-            "Unable to load grade sheet.",
-
-            "error"
-
-        )
+        flash("Unable to load grade sheet.", "error")
 
 
 
-        return redirect(
-
-            url_for("teacher_dashboard")
-
-        )
+        return redirect(url_for("teacher_subjects"))
 
 
 
 
 
 # ==========================================
+
+
+
+
 
 # LOGOUT
 
+
+
+
+
 # ==========================================
+
+
 
 
 
@@ -1580,30 +2587,30 @@ def logout():
 
 
 
-    return redirect(
-
-        url_for("login")
-
-    )
+    return redirect(url_for("login"))
 
 
 
 
 
 # ==========================================
+
+
+
+
 
 # RUN APPLICATION
 
+
+
+
+
 # ==========================================
+
+
 
 
 
 if __name__ == "__main__":
 
-
-
-    app.run(
-
-        debug=True
-
-    )
+    app.run(debug=True)

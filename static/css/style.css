@@ -543,3 +543,45 @@ textarea {
     }
 
 }
+
+<style>
+.subject-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.subject-page-header h1 {
+    margin: 0;
+}
+
+.subject-page-header p {
+    margin: 4px 0 0;
+}
+
+.dashboard-btn {
+    background: #555;
+    color: white;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.dashboard-btn:hover {
+    background: #333;
+}
+
+@media (max-width: 600px) {
+    .subject-page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .dashboard-btn {
+        text-align: center;
+    }
+}
+</style>

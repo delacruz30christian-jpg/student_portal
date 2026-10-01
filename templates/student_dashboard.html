@@ -3,308 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Student Dashboard</title>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4">
 </head>
 
 <body>
 
 <div class="student-dashboard-container">
 
-    <!-- =========================
-         DASHBOARD HEADER
-    ========================== -->
-
     <div class="dashboard-header">
-
         <div>
             <h1>Welcome, {{ student.full_name }}!</h1>
-
-            <p>
-                Student Dashboard
-            </p>
+            <p>Student Dashboard</p>
         </div>
-
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-            Logout
-        </a>
-
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
     </div>
 
-
-    <!-- =========================
-         FLASH MESSAGES
-    ========================== -->
-
     {% with messages = get_flashed_messages(with_categories=true) %}
-
         {% if messages %}
-
             {% for category, message in messages %}
-
-                <div class="flash {{ category }}">
-                    {{ message }}
-                </div>
-
+                <div class="flash {{ category }}">{{ message }}</div>
             {% endfor %}
-
         {% endif %}
-
     {% endwith %}
 
-
-    <!-- =========================
-         STUDENT INFORMATION
-    ========================== -->
-
     <div class="student-info-card">
-
         <h2>Student Information</h2>
-
         <br>
 
         <div class="student-info-grid">
-
             <div class="info-item">
-
                 <strong>Student Number</strong>
-
-                <span>
-                    {{ student.student_number or '-' }}
-                </span>
-
+                <span>{{ student.student_number or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Full Name</strong>
-
-                <span>
-                    {{ student.full_name or '-' }}
-                </span>
-
+                <span>{{ student.full_name or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Email</strong>
-
-                <span>
-                    {{ student.email or '-' }}
-                </span>
-
+                <span>{{ student.email or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Age</strong>
-
-                <span>
-                    {{ student.age or '-' }}
-                </span>
-
+                <span>{{ student.age or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Birthdate</strong>
-
-                <span>
-                    {{ student.birthdate or '-' }}
-                </span>
-
+                <span>{{ student.birthdate or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Gender</strong>
-
-                <span>
-                    {{ student.gender or '-' }}
-                </span>
-
+                <span>{{ student.gender or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Course</strong>
-
-                <span>
-                    {{ student.course or '-' }}
-                </span>
-
+                <span>{{ student.course or '-' }}</span>
             </div>
 
-
             <div class="info-item">
-
                 <strong>Year Level</strong>
-
-                <span>
-                    {{ student.year_level or '-' }}
-                </span>
-
+                <span>{{ student.year_level or '-' }}</span>
             </div>
-
 
             <div class="info-item">
-
                 <strong>Section</strong>
-
-                <span>
-                    {{ student.section or '-' }}
-                </span>
-
+                <span>{{ student.section or '-' }}</span>
             </div>
-
 
             <div class="info-item full-width">
-
                 <strong>Address</strong>
-
-                <span>
-                    {{ student.address or '-' }}
-                </span>
-
+                <span>{{ student.address or '-' }}</span>
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- =========================
-         GRADES
-    ========================== -->
+    <a href="{{ url_for('student_subjects') }}" class="btn">
+        Add Enrolled Subject
+    </a>
 
     <div class="grades-card">
 
         <div class="grades-header">
-
-            <h2>My Grades</h2>
-
-            <p>
-                Your encoded grades and computed averages
-            </p>
-
+            <h2>My Enrolled Subjects</h2>
+            <p>Subjects you are currently enrolled in</p>
         </div>
 
+        {% if enrolled_subjects %}
 
-        {% if grades %}
+            {% for subject in enrolled_subjects %}
 
-        <div class="table-wrapper">
+                <div class="student-subject-card"
+                     style="
+                        background:#fff;
+                        border:1px solid #ddd;
+                        border-radius:12px;
+                        padding:20px;
+                        margin-bottom:20px;
+                        box-shadow:0 2px 6px rgba(0,0,0,0.06);
+                     ">
 
-            <table class="student-grade-table">
+                    <h2 style="margin-bottom:8px;">
+                        {{ subject.subject_code }}
+                    </h2>
 
-                <thead>
+                    <p style="font-size:18px; margin-bottom:12px;">
+                        {{ subject.subject_name }}
+                    </p>
 
-                    <tr>
+                    <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-bottom:15px;">
+                        <p>
+                            <strong>Section:</strong>
+                            {{ subject.section or '-' }}
+                        </p>
 
-                        <th>Subject</th>
+                        <p>
+                            <strong>Instructor:</strong>
+                            {{ subject.teacher_name or '-' }}
+                        </p>
+                    </div>
 
-                        <th>Subject Name</th>
+                    <hr style="margin:18px 0; border:none; border-top:1px solid #ddd;">
 
-                        <th>Prelim</th>
+                    <h3>Grades</h3>
 
-                        <th>Midterm</th>
+                    <div style="overflow-x:auto; margin-top:10px;">
+                        <table class="student-grade-table">
+                            <thead>
+                                <tr>
+                                    <th>Prelim</th>
+                                    <th>Midterm</th>
+                                    <th>Finals</th>
+                                    <th>Average</th>
+                                </tr>
+                            </thead>
 
-                        <th>Finals</th>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        {{ subject.prelim if subject.prelim is not none else "-" }}
+                                    </td>
+                                    <td>
+                                        {{ subject.midterm if subject.midterm is not none else "-" }}
+                                    </td>
+                                    <td>
+                                        {{ subject.finals if subject.finals is not none else "-" }}
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            {{ subject.average if subject.average is not none else "-" }}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                        <th>Average</th>
+                    <form
+                        method="POST"
+                        action="{{ url_for('student_remove_subject', subject_id=subject.id) }}"
+                        style="margin-top:20px;"
+                        onsubmit="return confirm('Are you sure you want to remove this enrolled subject?');"
+                    >
+                        <button
+                            type="submit"
+                            class="register-btn"
+                            style="cursor:pointer; width:100%;"
+                        >
+                            Remove Enrollment
+                        </button>
+                    </form>
 
-                    </tr>
+                </div>
 
-                </thead>
-
-
-                <tbody>
-
-                    {% for grade in grades %}
-
-                    <tr>
-
-                        <td>
-                            {{ grade.subject_code }}
-                        </td>
-
-
-                        <td class="subject-name">
-                            {{ grade.subject_name }}
-                        </td>
-
-
-                        <td>
-
-                            {% if grade.prelim is not none %}
-                                {{ "%.2f"|format(grade.prelim|float) }}
-                            {% else %}
-                                -
-                            {% endif %}
-
-                        </td>
-
-
-                        <td>
-
-                            {% if grade.midterm is not none %}
-                                {{ "%.2f"|format(grade.midterm|float) }}
-                            {% else %}
-                                -
-                            {% endif %}
-
-                        </td>
-
-
-                        <td>
-
-                            {% if grade.finals is not none %}
-                                {{ "%.2f"|format(grade.finals|float) }}
-                            {% else %}
-                                -
-                            {% endif %}
-
-                        </td>
-
-
-                        <td class="student-average">
-
-                            {% if grade.average is not none %}
-                                {{ "%.2f"|format(grade.average|float) }}
-                            {% else %}
-                                -
-                            {% endif %}
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
+            {% endfor %}
 
         {% else %}
 
-        <div class="no-grades">
-
-            <h3>No grades available yet.</h3>
-
-            <p>
-                Your grades will appear here once your teacher encodes them.
-            </p>
-
-        </div>
+            <p>You are not enrolled in any subject yet.</p>
 
         {% endif %}
 

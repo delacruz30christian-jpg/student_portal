@@ -5,7 +5,8 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Teacher Dashboard</title>
 
@@ -20,7 +21,7 @@
 
         <div class="register-card">
 
-            <h1>Teacher Dashboard</h1>
+            <h1>Instructor Dashboard</h1>
 
             <p class="subtitle">
                 Welcome, {{ teacher.full_name }}!
@@ -30,7 +31,7 @@
 
             <div class="form-group">
 
-                <label>Teacher Name</label>
+                <label>Instructor Name</label>
 
                 <p>{{ teacher.full_name }}</p>
 
@@ -47,19 +48,23 @@
             <hr>
 
             <h2 style="margin-bottom: 20px;">
-                Grade Management
+                Subject Management
             </h2>
 
-            <a href="{{ url_for('gradebook') }}"
+            <a href="{{ url_for('teacher_subjects') }}"
                class="register-btn"
                style="display:block;
                       text-align:center;
                       text-decoration:none;
                       margin-bottom:15px;">
 
-                Open Grade Sheet
+                My Subjects
 
             </a>
+
+
+           
+
 
             <a href="{{ url_for('logout') }}"
                class="register-btn"

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Subject - Students Portal</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="register-container">
+
+    <div class="register-card">
+
+        <h1>Edit Subject</h1>
+
+        <p class="subtitle">
+            Update your subject information
+        </p>
+
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages =
+            get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- EDIT SUBJECT FORM -->
+
+        <form method="POST">
+
+            <div class="form-group">
+
+                <label for="subject_code">
+                    Subject Code
+                </label>
+
+                <input
+                    type="text"
+                    id="subject_code"
+                    name="subject_code"
+                    value="{{ subject.subject_code }}"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="subject_name">
+                    Subject Name
+                </label>
+
+                <input
+                    type="text"
+                    id="subject_name"
+                    name="subject_name"
+                    value="{{ subject.subject_name }}"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="section">
+                    Section
+                </label>
+
+                <select
+                    id="section"
+                    name="section"
+                    required>
+
+                    <option
+                        value="A"
+                        {% if subject.section == "A" %}
+                            selected
+                        {% endif %}
+                    >
+                        A
+                    </option>
+
+                    <option
+                        value="B"
+                        {% if subject.section == "B" %}
+                            selected
+                        {% endif %}
+                    >
+                        B
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="register-btn">
+
+                Save Changes
+
+            </button>
+
+        </form>
+
+
+        <!-- CANCEL -->
+
+        <p style="
+            text-align:center;
+            margin-top:20px;
+        ">
+
+            <a href="{{ url_for('teacher_subjects') }}">
+                Cancel
+            </a>
+
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Enrolled Subject</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}?v=7">
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .subjects-page {
+            width: 95%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .subjects-header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .subjects-header h1 {
+            margin: 0 0 5px;
+            font-size: 32px;
+        }
+
+        .subjects-header p {
+            margin: 0;
+            color: #666;
+        }
+
+        .dashboard-btn {
+            display: inline-block;
+            background: #555;
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .dashboard-btn:hover {
+            background: #333;
+        }
+
+        .subjects-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .subjects-section h2 {
+            margin: 0 0 18px;
+            font-size: 25px;
+        }
+
+        .subject-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .subject-card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fafafa;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .subject-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .subject-code {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .subject-name {
+            font-size: 17px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .subject-info {
+            margin: 5px 0;
+            color: #444;
+            font-size: 14px;
+        }
+
+        .subject-info strong {
+            color: #222;
+        }
+
+        .enroll-btn {
+            width: 100%;
+            margin-top: 16px;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            background: #2864e8;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .enroll-btn:hover {
+            background: #1f54c7;
+        }
+
+        .already-enrolled {
+            margin-top: 16px;
+            color: green;
+            font-weight: bold;
+        }
+
+        .no-subjects {
+            text-align: center;
+            padding: 30px 10px;
+            color: #666;
+        }
+
+        .flash {
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .subjects-page {
+                width: 92%;
+                margin: 20px auto;
+            }
+
+            .subjects-header {
+                padding: 20px;
+                align-items: flex-start;
+            }
+
+            .subjects-header h1 {
+                font-size: 26px;
+            }
+
+            .subjects-section {
+                padding: 20px;
+            }
+
+            .subject-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .subjects-header {
+                flex-direction: column;
+            }
+
+            .dashboard-btn {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="subjects-page">
+
+    <!-- PAGE HEADER -->
+    <div class="subjects-header">
+
+        <div>
+            <h1>Add Enrolled Subject</h1>
+            <p>Select a subject to enroll</p>
+        </div>
+
+        <a href="{{ url_for('student_dashboard') }}"
+           class="dashboard-btn">
+            ← Dashboard
+        </a>
+
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- AVAILABLE SUBJECTS -->
+    <div class="subjects-section">
+
+        <h2>Available Subjects</h2>
+
+        {% if subjects %}
+
+            <div class="subject-list">
+
+                {% for subject in subjects %}
+
+                    <div class="subject-card">
+
+                        <div class="subject-code">
+                            {{ subject.subject_code }}
+                        </div>
+
+                        <div class="subject-name">
+                            {{ subject.subject_name }}
+                        </div>
+
+                        <div class="subject-info">
+                            <strong>Section:</strong>
+                            {{ subject.section }}
+                        </div>
+
+                        <div class="subject-info">
+                            <strong>Instructor:</strong>
+                            {{ subject.teacher_name }}
+                        </div>
+
+                        {% if subject.id in enrolled_ids %}
+
+                            <div class="already-enrolled">
+                                ✓ Already Enrolled
+                            </div>
+
+                        {% else %}
+
+                            <form method="POST"
+                                  action="{{ url_for('student_subjects') }}">
+
+                                <input type="hidden"
+                                       name="subject_id"
+                                       value="{{ subject.id }}">
+
+                                <button type="submit"
+                                        class="enroll-btn">
+                                    Enroll in Subject
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="no-subjects">
+                No subjects are available for enrollment.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
