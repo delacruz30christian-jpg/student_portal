@@ -13,6 +13,23 @@ from supabase import create_client
 from dotenv import load_dotenv
 
 
+def format_full_name(name):
+    name = " ".join(name.strip().split())
+
+    if not name:
+        return ""
+
+    parts = name.split(",", 1)
+
+    if len(parts) == 2:
+        last_name = parts[0].strip().upper()
+        first_name = parts[1].strip().upper()
+
+        return f"{last_name}, {first_name}"
+
+    return name.upper()
+
+
 # ==========================================
 
 
@@ -150,7 +167,7 @@ def register():
 def teacher_register():
 
     if request.method == "POST":
-        full_name = request.form.get("full_name", "").strip()
+        full_name = format_full_name(request.form.get("full_name", ""))
 
         email = request.form.get("email", "").strip().lower()
 
